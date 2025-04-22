@@ -1,0 +1,66 @@
+version: '3.7'
+
+volumes:
+  nginx-logs:
+
+
+services:
+  hello-react:
+    image: hello-react
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx-logs:/var/log/nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    #restart: unless-stopped
+
+  log-db:
+    # Loki
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command:
+      -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    #restart: unless-stopped
+
+  log-shipper:
+    # Promtail
+    image: grafana/promtail:latest
+    ports:
+      - "9080:9080"
+    volumes:
+      - ./etc/promtail-config.yml:/etc/promtail/config.yml
+      - ./nginx-logs:/var/log/nginx:ro
+    command:
+      -config.file=/etc/promtail/config.yml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9080/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    #restart: unless-stopped
+
+  log-ui:
+    # Grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - log-db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    #restart: unless-stopped

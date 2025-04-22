@@ -1,0 +1,39 @@
+---
+- name : setup Hello docker Enviroment
+  hosts: localhost
+  become: true
+
+
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker compose is installed
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Build the hello-react Docker image
+      community.docker.docker_image:
+        name: hello-react
+        source: build
+        build:
+          path: "{{ playbook_dir }}/../hello-react"  # Path to the directory containing your Dockerfile
+        state: present
+
+    - name: pull necessary Docker images
+      community.docker.docker_image:
+        name: "{{item }}"
+        source: pull
+      loop:
+        - grafana/loki:latest
+        - grafana/promtail:latest
+        - grafana/grafana:latest
+
+    - name: start Docker compose
+      community.docker.docker_compose:
+        project_src: "{{ playbook_dir }}/.."
+

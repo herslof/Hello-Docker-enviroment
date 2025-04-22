@@ -1,0 +1,17 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 9095  # Keep gRPC port if needed
+
+clients:
+  - url: http://log-db:3100/loki/api/v1/push
+
+positions:
+  filename: /tmp/positions.yaml
+
+scrape_configs:
+  - job_name: 'nginx-logs'
+    static_configs:
+      - targets: ['localhost']
+        labels:
+          job: 'nginx'
+          __path__: /var/log/nginx/*.log
