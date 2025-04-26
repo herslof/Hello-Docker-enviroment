@@ -5,8 +5,8 @@ volumes:
 
 
 services:
-  hello-react:
-    image: hello-react
+  hello-frontend:
+    image: hello-frontend
     ports:
       - "8080:80"
     volumes:

@@ -17,10 +17,10 @@
         name: docker-compose
         state: present
 
-    - name: Build the hello-react Docker image
+    - name: Build the hello-frontend Docker image
       community.docker.docker_image_build:
-        name: hello-react
-        path: "{{ playbook_dir }}/../hello-react"
+        name: hello-frontend
+        path: "{{ playbook_dir }}/../hello-frontend"
         dockerfile: Dockerfile
         args:
           REACT_ENV_FILE: "env.{{ deploy_env }}"
