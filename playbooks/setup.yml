@@ -36,6 +36,11 @@
         - grafana/promtail:latest
         - grafana/grafana:latest
 
+    - name: Tear down Docker compose if running
+      community.docker.docker_compose:
+        project_src: "{{ playbook_dir }}/.."
+        state: absent
+
     - name: start Docker compose
       community.docker.docker_compose:
         project_src: "{{ playbook_dir }}/.."
