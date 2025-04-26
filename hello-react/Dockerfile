@@ -4,6 +4,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+ARG REACT_ENV_FILE=env.local
+RUN cp $REACT_ENV_FILE .env && \
+    echo "window._env_ = {" > public/env.js && \
+    grep -v '^#' .env | sed -E 's/(.*)=(.*)/ \1: "\2",/' >> public/env.js && \
+    echo "};" >> public/env.js
+
 RUN npm run build
 
 #Serve it with nginx

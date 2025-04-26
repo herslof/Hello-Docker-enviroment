@@ -2,6 +2,8 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const environment = process.env.REACT_APP_ENVIRONMENT || "Unknown";
+
   return (
     <div className="App">
       <header className="App-header">
@@ -9,7 +11,7 @@ function App() {
         <p>
           <div className="App">
             <h1>Welcome to My React App!</h1>
-            <p>This is my first production build in Docker!</p>
+            <p>This is app is running in the {environment} set by ansible!</p>
           </div>
         </p>
         <a

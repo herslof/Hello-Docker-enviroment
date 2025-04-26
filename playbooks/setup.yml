@@ -1,8 +1,9 @@
 ---
-- name : setup Hello docker Enviroment
+- name : setup Hello docker Environment
   hosts: localhost
   become: true
-
+  vars:
+    deploy_env : "{{ deploy_env  | default('production') }}"
 
   tasks:
     - name: Ensure Docker is installed
@@ -17,12 +18,14 @@
         state: present
 
     - name: Build the hello-react Docker image
-      community.docker.docker_image:
+      community.docker.docker_image_build:
         name: hello-react
-        source: build
-        build:
-          path: "{{ playbook_dir }}/../hello-react"  # Path to the directory containing your Dockerfile
-        state: present
+        path: "{{ playbook_dir }}/../hello-react"
+        dockerfile: Dockerfile
+        args:
+          REACT_ENV_FILE: "env.{{ deploy_env }}"
+        rebuild: "{{ 'always' if force_rebuild | default(false) else 'never' }}"
+        tag: latest
 
     - name: pull necessary Docker images
       community.docker.docker_image:
@@ -36,4 +39,7 @@
     - name: start Docker compose
       community.docker.docker_compose:
         project_src: "{{ playbook_dir }}/.."
+        build: yes
+        recreate: always
+        remove_orphans: yes
 
