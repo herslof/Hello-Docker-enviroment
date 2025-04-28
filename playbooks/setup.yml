@@ -6,11 +6,17 @@
     deploy_env : "{{ deploy_env  | default('production') }}"
 
   tasks:
-    - name: Ensure Docker is installed
+    - name: Check if Docker is installed
+      command: docker --version
+      register: docker_installed
+      ignore_errors: yes
+
+    - name: Install Docker if not already installed
       apt:
         name: docker.io
         state: present
         update_cache: yes
+      when: docker_installed.rc != 0
 
     - name: Ensure Docker compose is installed
       apt:
@@ -24,6 +30,14 @@
         dockerfile: Dockerfile
         args:
           REACT_ENV_FILE: "env.{{ deploy_env }}"
+        rebuild: "{{ 'always' if force_rebuild | default(false) else 'never' }}"
+        tag: latest
+
+    - name: Build the hello-backend Docker image
+      community.docker.docker_image_build:
+        name: hello-backend
+        path: "{{ playbook_dir }}/../hello-backend"
+        dockerfile: Dockerfile
         rebuild: "{{ 'always' if force_rebuild | default(false) else 'never' }}"
         tag: latest
 

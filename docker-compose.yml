@@ -18,6 +18,13 @@ services:
       retries: 3
     #restart: unless-stopped
 
+  hello-backend:
+    image: hello-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+
   log-db:
     # Loki
     image: grafana/loki:latest
