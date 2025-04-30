@@ -3,7 +3,6 @@ version: '3.7'
 volumes:
   nginx-logs:
 
-
 services:
   hello-frontend:
     image: hello-frontend
@@ -13,6 +12,7 @@ services:
       - "8443:443"
     volumes:
       - ./nginx-logs:/var/log/nginx
+      - ./certs:/etc/nginx/certs:ro
     networks:
       - hello-network
     healthcheck:
