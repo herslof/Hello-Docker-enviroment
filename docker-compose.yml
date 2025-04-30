@@ -10,6 +10,7 @@ services:
     build: ./hello-frontend
     ports:
       - "8080:80"
+      - "8443:443"
     volumes:
       - ./nginx-logs:/var/log/nginx
     networks:
