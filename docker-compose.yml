@@ -7,10 +7,13 @@ volumes:
 services:
   hello-frontend:
     image: hello-frontend
+    build: ./hello-frontend
     ports:
       - "8080:80"
     volumes:
       - ./nginx-logs:/var/log/nginx
+    networks:
+      - hello-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -22,6 +25,8 @@ services:
     image: hello-backend
     ports:
       - "5000:5000"
+    networks:
+      - hello-network
     environment:
       - SPRING_PROFILES_ACTIVE=default
 
@@ -71,3 +76,7 @@ services:
       timeout: 5s
       retries: 3
     #restart: unless-stopped
+
+networks:
+  hello-network:
+    driver: bridge

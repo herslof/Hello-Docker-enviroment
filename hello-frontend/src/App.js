@@ -1,8 +1,21 @@
 import logo from './logo.svg';
+import {useEffect, useState} from "react";
 import './App.css';
 
 function App() {
   const environment = process.env.REACT_APP_ENVIRONMENT || "Unknown";
+  const [backendMessage, setBackendMessage] = useState("");
+
+  useEffect( () => {
+    fetch("/api/hello")
+      .then ((response) => response.json())
+      .then((data) => setBackendMessage(data.message))
+      .catch((error) => {
+        console.error("error fetching from backend:", error);
+        setBackendMessage("Failed to fetch backend message.");
+      });
+    }, []
+  )
 
   return (
     <div className="App">
@@ -12,6 +25,7 @@ function App() {
           <div className="App">
             <h1>Welcome to My React App!</h1>
             <p>This is app is running in the {environment} set by ansible!</p>
+            <p>Backend says: {backendMessage}</p>
           </div>
         </p>
         <a
