@@ -2,6 +2,7 @@ version: '3.7'
 
 volumes:
   nginx-logs:
+  pgdata:
 
 services:
   hello-frontend:
@@ -14,7 +15,7 @@ services:
       - ./nginx-logs:/var/log/nginx
       - ./certs:/etc/nginx/certs:ro
     networks:
-      - hello-network
+      - hello-public
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -24,12 +25,27 @@ services:
 
   hello-backend:
     image: hello-backend
-    ports:
-      - "5000:5000"
+    build: ./hello-backend
+    expose:
+      - "5000"
     networks:
-      - hello-network
+      - hello-public
+      - hello-private
     environment:
       - SPRING_PROFILES_ACTIVE=default
+
+  hello-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: helloapp
+      POSTGRES_PASSWORD: hellopass
+      POSTGRES_DB: helloapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - hello-private
 
   log-db:
     # Loki
@@ -79,5 +95,7 @@ services:
     #restart: unless-stopped
 
 networks:
-  hello-network:
+  hello-public:
+    driver: bridge
+  hello-private:
     driver: bridge
