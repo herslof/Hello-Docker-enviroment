@@ -7,9 +7,14 @@ function App() {
   const [backendMessage, setBackendMessage] = useState("");
 
   useEffect( () => {
-    fetch("/api/hello")
+    fetch("/api/messages")
       .then ((response) => response.json())
-      .then((data) => setBackendMessage(data.message))
+      .then((data) => {
+        const formatted = data
+            .map(msg => `${msg.username}: ${msg.message} (${msg.timestamp})`)
+        .join("\n");
+        setBackendMessage(formatted);
+      })
       .catch((error) => {
         console.error("error fetching from backend:", error);
         setBackendMessage("Failed to fetch backend message.");
