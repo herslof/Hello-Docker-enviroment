@@ -29,4 +29,3 @@ public class HelloMessageController {
         );
     }
 }
-1306
