@@ -1,6 +1,13 @@
 import logo from './logo.svg';
 import {useEffect, useState} from "react";
 import './App.css';
+import DOMPurify from 'dompurify';
+
+export const sanitizeMessage = (msg) => ({
+    username: DOMPurify.sanitize(msg.username),
+    message: DOMPurify.sanitize(msg.message),
+    timestamp: msg.timestamp
+});
 
 function App() {
   const environment = process.env.REACT_APP_ENVIRONMENT || "Unknown";
@@ -53,13 +60,14 @@ function App() {
   }
 
   const renderMessages = () =>
-      messages.map((msg, idx) => (
-          <p key={idx}>
-            <strong>{msg.username}</strong>: {msg.message} {msg.timestamp}
+    messages.map((msg, idx) => {
+        const clean = sanitizeMessage(msg);
+        return (
+        <p key={idx}>
+              <strong>{clean.username}</strong>: {clean.message} {clean.timestamp}
           </p>
-          )
-      );
-
+          );
+      });
 
   return (
     <div className="App">
